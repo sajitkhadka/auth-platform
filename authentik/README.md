@@ -47,6 +47,11 @@ The chart brings up Authentik empty. Bootstrap creds are printed by the chart no
 2. **Per-subapp OIDC Provider + Application** (one per consumer):
    - Provider: OAuth2/OpenID, client type = confidential (or public + PKCE),
      redirect URIs = the app's callback, sign with a signing key.
+   - **Set the provider's Grant types to include `authorization_code` (+ `refresh_token`).**
+     Creating a provider via the API leaves `grant_types` EMPTY, and the authorize
+     endpoint then rejects every request with `invalid_request` / "The request is
+     otherwise malformed" (Authentik logs "Invalid grant_type for provider"). Fix via
+     `PATCH /api/v3/providers/oauth2/<pk>/ {"grant_types":["authorization_code","refresh_token"]}`.
    - Application: bind to the provider; note the `client_id` / `client_secret`.
    - The broker (`connect.sajitkhadka.com`) is itself one such OIDC application.
 

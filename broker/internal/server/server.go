@@ -96,6 +96,13 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
+	// The IdP signals authorization failures by redirecting back with ?error=...
+	// (not a code), so check that before attempting the exchange.
+	if e := r.URL.Query().Get("error"); e != "" {
+		s.log.Error("authorization denied by IdP", "error", e, "desc", r.URL.Query().Get("error_description"))
+		http.Error(w, "authorization error: "+e, http.StatusBadGateway)
+		return
+	}
 	c, err := r.Cookie("oidc_state")
 	if err != nil || r.URL.Query().Get("state") != c.Value {
 		http.Error(w, "bad state", http.StatusBadRequest)
@@ -103,12 +110,14 @@ func (s *Server) handleAuthCallback(w http.ResponseWriter, r *http.Request) {
 	}
 	oauth2Token, err := s.oauth.Exchange(r.Context(), r.URL.Query().Get("code"))
 	if err != nil {
+		s.log.Error("token exchange failed", "err", err)
 		http.Error(w, "exchange failed", http.StatusBadGateway)
 		return
 	}
 	rawID, _ := oauth2Token.Extra("id_token").(string)
 	idToken, err := s.idVerifier.Verify(r.Context(), rawID)
 	if err != nil {
+		s.log.Error("id_token verify failed", "err", err)
 		http.Error(w, "id_token invalid", http.StatusUnauthorized)
 		return
 	}
