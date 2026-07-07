@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: connect-broker
+  namespace: connect
+  labels:
+    app: connect-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: connect-broker
+  template:
+    metadata:
+      labels:
+        app: connect-broker
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: broker
+          image: 192.168.0.120:5000/connect-broker:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: connect-config
+            - secretRef:
+                name: connect-secrets
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: connect-broker
+  namespace: connect
+spec:
+  selector:
+    app: connect-broker
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: connect-ingress
+  namespace: connect
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns01
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - connect.sajitkhadka.com
+      secretName: connect-tls
+  rules:
+    - host: connect.sajitkhadka.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: connect-broker
+                port:
+                  number: 80

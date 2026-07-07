@@ -1,0 +1,16 @@
+# Plaintext secrets — NEVER commit. Only the sealed (*.sealed.yaml) versions belong in git.
+# Fill in the *.template.yaml -> save as the un-suffixed name below -> seal -> commit sealed.
+authentik/secrets/authentik-secrets.yaml
+broker/deploy/connect-secrets.yaml
+infra/cert-manager/cloudflare-api-token.yaml
+sealed-secrets-key.backup.yaml
+*.sealed.plaintext.yaml
+
+# Go
+broker/broker
+broker/bin/
+*.exe
+
+# local env
+.env
+.env.*

@@ -1,0 +1,19 @@
+# Prod overlay — release in namespace `authentik`, host Postgres :5432.
+# helm upgrade --install authentik authentik/authentik \
+#   -n authentik --create-namespace \
+#   -f authentik/helm/values-common.yaml -f authentik/helm/values-prod.yaml
+
+authentik:
+  postgresql:
+    port: 5432
+    name: authentik
+    user: authentik
+
+server:
+  ingress:
+    hosts:
+      - auth.sajitkhadka.com
+    tls:
+      - hosts:
+          - auth.sajitkhadka.com
+        secretName: authentik-tls

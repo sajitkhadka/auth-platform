@@ -1,0 +1,30 @@
+# Let's Encrypt ClusterIssuer using DNS-01 (Cloudflare).
+#
+# Why DNS-01: works even when :80 is not publicly reachable and can issue
+# wildcard certs. Your existing `letsencrypt-prod` issuer uses HTTP-01 and
+# already works — this is an additive, second issuer scoped to auth-platform.
+#
+# Prereq: a Cloudflare API token (Zone.DNS:Edit for sajitkhadka.com), stored as
+# a k8s secret. Create it as a SEALED secret (see infra/sealed-secrets/), e.g.
+# from cloudflare-api-token.template.yaml. If you use a different DNS provider
+# (Route53, Google Cloud DNS, etc.) swap the `solvers[].dns01` block accordingly.
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-dns01
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: sajitkhadka@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-dns01-account-key
+    solvers:
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token
+        selector:
+          dnsZones:
+            - sajitkhadka.com

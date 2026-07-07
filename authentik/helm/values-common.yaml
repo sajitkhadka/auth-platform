@@ -1,0 +1,48 @@
+# Common Authentik Helm values (shared by dev + prod).
+# Chart: authentik/authentik  (https://charts.goauthentik.io)
+#
+# Secrets (AUTHENTIK_SECRET_KEY, AUTHENTIK_POSTGRESQL__PASSWORD) are injected via
+# envFrom -> the sealed `authentik-secrets` Secret, NOT set here. Non-secret DB
+# coordinates live in the per-env overlay (values-dev/prod.yaml).
+
+authentik:
+  # error reporting off for a self-hosted personal deployment
+  error_reporting:
+    enabled: false
+  postgresql:
+    # host/port/name/user come from the per-env overlay; password via envFrom
+    host: "192.168.0.120"
+  redis:
+    # points at the bundled redis subchart (release-name-redis-master)
+    host: "{{ .Release.Name }}-redis-master"
+
+# Pull AUTHENTIK_SECRET_KEY + AUTHENTIK_POSTGRESQL__PASSWORD from the sealed secret.
+# Applies to both server and worker.
+envFrom:
+  - secretRef:
+      name: authentik-secrets
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-dns01
+    # host + tls secretName set per-env
+  metrics:
+    enabled: false
+
+worker:
+  replicas: 1
+
+# Use the EXTERNAL host Postgres (see scripts/postgres/) — do NOT deploy the
+# bundled postgresql subchart.
+postgresql:
+  enabled: false
+
+# Bundled Redis is fine (Authentik uses it as cache/broker, no durable data).
+redis:
+  enabled: true
+  master:
+    persistence:
+      enabled: false

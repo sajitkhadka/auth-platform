@@ -1,0 +1,19 @@
+# Dev overlay — release in namespace `authentik-dev`, host Postgres :5433.
+# helm upgrade --install authentik authentik/authentik \
+#   -n authentik-dev --create-namespace \
+#   -f authentik/helm/values-common.yaml -f authentik/helm/values-dev.yaml
+
+authentik:
+  postgresql:
+    port: 5433
+    name: authentik_dev
+    user: authentik_dev
+
+server:
+  ingress:
+    hosts:
+      - dev.auth.sajitkhadka.com
+    tls:
+      - hosts:
+          - dev.auth.sajitkhadka.com
+        secretName: authentik-tls

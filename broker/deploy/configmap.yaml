@@ -1,0 +1,15 @@
+# Non-secret broker config (prod namespace: connect). For dev, copy to
+# namespace connect-dev and swap the *.sajitkhadka.com hosts / issuer slugs.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: connect-config
+  namespace: connect
+data:
+  BASE_URL: "https://connect.sajitkhadka.com"
+  # The broker's OWN Authentik application (for its login session):
+  AUTHENTIK_ISSUER: "https://auth.sajitkhadka.com/application/o/connect/"
+  # Inbound subapp token validation. Requires Authentik providers to share a
+  # global issuer + signing key (see README). Point JWKS at that shared key set.
+  AUTHENTIK_TOKEN_ISSUER: "https://auth.sajitkhadka.com/application/o/"
+  AUTHENTIK_JWKS_URL: "https://auth.sajitkhadka.com/application/o/connect/jwks/"

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: connect
+---
+# Dev namespace (deploy the same manifests here, swapping host -> dev.connect.sajitkhadka.com,
+# DATABASE_URL -> :5433/connect_dev, and the Authentik issuer slug for the dev instance).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: connect-dev

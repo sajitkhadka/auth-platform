@@ -1,0 +1,17 @@
+# TEMPLATE — do NOT commit the filled-in version. Seal it instead.
+#
+# The Cloudflare API token cert-manager uses for DNS-01. Must live in the
+# cert-manager namespace (that's where the ACME solver runs).
+#
+# Fill in the token, then seal:
+#   kubeseal --format=yaml --controller-namespace kube-system \
+#     < cloudflare-api-token.yaml > cloudflare-api-token.sealed.yaml
+#   kubectl apply -f cloudflare-api-token.sealed.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-api-token
+  namespace: cert-manager
+type: Opaque
+stringData:
+  api-token: "REPLACE_WITH_CLOUDFLARE_API_TOKEN"
