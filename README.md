@@ -8,8 +8,10 @@ per-app Google API access.
 - **Google API access:** a dedicated **Google Connections broker** at
   `connect.sajitkhadka.com` that gives each subapp only the Google scopes it needs.
 
-See [`docs/DESIGN.md`](docs/DESIGN.md) for the full architecture and rollout plan, and
-[`docs/integration.md`](docs/integration.md) for the subapp integration contract.
+See [`docs/`](docs/) for all documentation — start with the [docs index](docs/README.md).
+Key entries: [DESIGN](docs/DESIGN.md) (rationale), [ARCHITECTURE](docs/ARCHITECTURE.md) (as
+built), [DEPLOYMENT-LOG](docs/DEPLOYMENT-LOG.md) (how it was stood up), the
+[add-an-app runbook](docs/runbooks/add-an-app.md), and the [ADRs](docs/adr/).
 
 ## Status
 
