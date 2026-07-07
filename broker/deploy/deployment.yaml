@@ -66,7 +66,9 @@ metadata:
   name: connect-ingress
   namespace: connect
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-dns01
+    # HTTP-01 today (matches Authentik). Switch to letsencrypt-dns01 once the
+    # Cloudflare API token is sealed (see infra/cert-manager/).
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
   tls:
