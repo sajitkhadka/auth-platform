@@ -9,7 +9,9 @@ data:
   BASE_URL: "https://connect.sajitkhadka.com"
   # The broker's OWN Authentik application (for its login session):
   AUTHENTIK_ISSUER: "https://auth.sajitkhadka.com/application/o/connect/"
-  # Inbound subapp token validation. Requires Authentik providers to share a
-  # global issuer + signing key (see README). Point JWKS at that shared key set.
-  AUTHENTIK_TOKEN_ISSUER: "https://auth.sajitkhadka.com/application/o/"
+  # Inbound subapp token validation. For now the broker is the only /token consumer,
+  # so we validate against its own per-provider issuer + JWKS. When a SECOND app starts
+  # calling /token, switch Authentik providers to global issuer mode (or extend the
+  # verifier to resolve keys per azp) and update these two values. See README.
+  AUTHENTIK_TOKEN_ISSUER: "https://auth.sajitkhadka.com/application/o/connect/"
   AUTHENTIK_JWKS_URL: "https://auth.sajitkhadka.com/application/o/connect/jwks/"

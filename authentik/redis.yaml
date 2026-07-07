@@ -1,0 +1,53 @@
+# Redis for Authentik (cache + task broker). The authentik chart (2026.5.3) does not
+# bundle Redis, so we run a small one in-namespace. No persistence — Authentik only uses
+# it as an ephemeral cache/broker; losing it on restart is acceptable for this deployment.
+#
+# Apply into the same namespace as the Authentik release (authentik / authentik-dev):
+#   kubectl apply -n authentik -f authentik/redis.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authentik-redis
+  labels:
+    app: authentik-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentik-redis
+  template:
+    metadata:
+      labels:
+        app: authentik-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          args: ["--save", "", "--appendonly", "no"]
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: "25m"
+              memory: "32Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+          readinessProbe:
+            tcpSocket:
+              port: 6379
+            initialDelaySeconds: 2
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authentik-redis
+  labels:
+    app: authentik-redis
+spec:
+  selector:
+    app: authentik-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
