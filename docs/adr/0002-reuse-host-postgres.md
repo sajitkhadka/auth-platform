@@ -17,7 +17,7 @@ Reuse the existing host Postgres. Create dedicated databases + roles: `authentik
 deploy the chart's bundled Postgres (`postgresql.enabled: false`).
 
 Provisioning is a documented SQL script (`scripts/postgres/provision.sql`) run by the
-Postgres superuser (role `sajit`); connection strings live only in sealed secrets.
+Postgres superuser; connection strings live only in sealed secrets.
 
 ## Consequences
 

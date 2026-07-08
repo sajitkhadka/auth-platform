@@ -33,7 +33,7 @@ The platform separates two concerns that are often conflated:
                              Google APIs (Calendar/Drive/…)
 ```
 
-Both planes run on an existing single-node **k3s** cluster (`sserver`, 192.168.0.120) and
+Both planes run on an existing single-node **k3s** cluster (192.168.0.120) and
 reuse cluster services already present there (cert-manager, ingress-nginx, host Postgres,
 a local image registry).
 
@@ -44,14 +44,14 @@ a local image registry).
 
 ## 2. Infrastructure
 
-Single-node k3s v1.31.5 on `sserver` (192.168.0.120). Public IP `<ORIGIN_PUBLIC_IP>`, with
-`:80/:443` port-forwarded to the node; DNS on Cloudflare.
+Single-node k3s on the LAN host (192.168.0.120), with `:80/:443` reachable from the
+internet via the edge router; DNS on Cloudflare.
 
 Reused, already-present cluster components:
 - **ingress-nginx** — single ingress controller, terminates TLS on `:443`.
 - **cert-manager** — ACME certificates. Existing `letsencrypt-prod` ClusterIssuer (HTTP-01).
 - **Host Postgres** — runs on the host (not in k8s): prod `:5432`, dev `:5433`. Reached over
-  the LAN with `sslmode=disable`, one DB+role per app. Superuser role is `sajit`.
+  the LAN with `sslmode=disable`, one DB+role per app.
 - **Local image registry** `192.168.0.120:5000` — plain HTTP; node containerd already trusts it.
 
 Added for auth-platform:

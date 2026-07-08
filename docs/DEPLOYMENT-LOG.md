@@ -8,7 +8,7 @@ in [`DESIGN.md`](DESIGN.md). Deployed **2026-07-07**.
 ## Phase A — Investigate the target
 
 Before writing manifests, inventoried the cluster:
-- `kubectl` + kubeconfig already pointed at the cluster (`sserver`, k3s v1.31.5, admin access).
+- `kubectl` + kubeconfig already pointed at the cluster (k3s, admin access).
 - cert-manager and ingress-nginx already installed; existing apps get certs via HTTP-01
   (`letsencrypt-prod`), so the box is reachable on `:80` from the internet.
 - **No Postgres pod** in-cluster, yet `:5432` open on the host → Postgres runs on the host.
@@ -36,9 +36,9 @@ Calendar API enabled; consent screen kept in Testing with the user as a test use
 
 ## Phase 1 — Cluster prerequisites
 
-- Confirmed DNS: `synctodo` resolved to the public IP but `auth`/`connect` had **no records**.
-  User added A records `auth`/`connect` → `<ORIGIN_PUBLIC_IP>` (grey-cloud) in Cloudflare (which
-  is where the zone is hosted — `algin`/`amber.ns.cloudflare.com`).
+- Confirmed DNS: existing apps resolved to the public IP but `auth`/`connect` had **no records**.
+  User added A records `auth`/`connect` → the origin's public IP in Cloudflare (which is where
+  the zone is hosted).
 - Installed local tooling into the session scratchpad: **helm v4.2.2**, **kubeseal v0.38.4**.
 - Installed the **sealed-secrets controller** v0.38.4. *(First attempt via `kubectl apply -f
   <remote-url>` was correctly blocked by a guardrail — unread remote manifest with RBAC into a
@@ -47,7 +47,7 @@ Calendar API enabled; consent screen kept in Testing with the user as a test use
 
 ## Phase 2 — Provision databases
 
-Postgres requires a password for the superuser (no trust auth). Superuser role is **`sajit`**.
+Postgres requires a password for the superuser (no trust auth).
 Created two databases + roles via a throwaway `postgres:16-alpine` pod (existing DBs
 untouched):
 ```
